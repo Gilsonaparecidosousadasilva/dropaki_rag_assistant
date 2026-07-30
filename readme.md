@@ -6,34 +6,6 @@ O projeto usa a técnica de **RAG (Retrieval-Augmented Generation)**: em vez de 
 
 ---
 
-## 🏗️ Arquitetura da solução
-
-O projeto é dividido em duas etapas independentes:
-
-\`\`\`
-┌─────────────────┐        ┌──────────────────┐        ┌─────────────────┐
-│   docs/          │        │    ingest.py      │        │   chroma_db/     │
-│ (PDF, DOCX, PPTX,│  ──▶   │  Carrega, divide   │  ──▶   │  Banco vetorial   │
-│  MD, CSV, XLSX,  │        │  em chunks e gera  │        │  persistido       │
-│  HTML, JSON)      │        │  embeddings        │        │  (ChromaDB)       │
-└─────────────────┘        └──────────────────┘        └─────────────────┘
-                                                                    │
-                                                                    ▼
-┌─────────────────┐        ┌──────────────────┐        ┌─────────────────┐
-│   Usuário         │  ──▶   │     app.py         │  ◀──   │   Retriever       │
-│  (chat Streamlit) │        │  Interface + Chain  │        │  (busca por        │
-│                   │  ◀──   │  RAG (LangChain)    │        │  similaridade)     │
-└─────────────────┘        └──────────────────┘        └─────────────────┘
-                                     │
-                                     ▼
-                            ┌──────────────────┐
-                            │  Gemini (LLM)      │
-                            │  gera a resposta    │
-                            │  com base no        │
-                            │  contexto recuperado │
-                            └──────────────────┘
-\`\`\`
-
 **1. Ingestão (`ingest.py`)**
 - Varre a pasta `docs/` e carrega qualquer arquivo suportado (PDF, DOCX, PPTX, Markdown, CSV, XLSX, HTML, JSON) usando o loader apropriado para cada extensão.
 - Divide os documentos em pedaços menores (*chunks*) com `RecursiveCharacterTextSplitter` (1000 caracteres, 200 de sobreposição), para que o retriever encontre trechos relevantes com precisão.
